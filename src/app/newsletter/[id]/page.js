@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
-import { ArrowLeft, Download, Newspaper } from 'lucide-react'
+import { ArrowLeft, Download, Newspaper, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewsletterDetailPage() {
@@ -68,15 +68,31 @@ export default function NewsletterDetailPage() {
         </div>
 
         <div className="space-y-6">
-          {pages.map((page, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden">
-              <img src={page.image_url} alt={`${newsletter.title} - 페이지 ${i + 1}`}
-                className="w-full h-auto" />
-              <div className="px-4 py-2 bg-brand-charcoal/5 text-center">
-                <span className="text-xs text-brand-charcoal/40">{i + 1} / {pages.length}</span>
-              </div>
-            </div>
-          ))}
+          {pages.map((page, i) => {
+            const Wrapper = page.link_url ? 'a' : 'div'
+            const wrapperProps = page.link_url
+              ? { href: page.link_url, target: '_blank', rel: 'noopener noreferrer' }
+              : {}
+            return (
+              <Wrapper key={i}
+                className="bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden group relative"
+                {...wrapperProps}>
+                <img src={page.image_url} alt={`${newsletter.title} - 페이지 ${i + 1}`}
+                  className="w-full h-auto" />
+                <div className="px-4 py-2 bg-brand-charcoal/5 flex items-center justify-center gap-2">
+                  <span className="text-xs text-brand-charcoal/40">{i + 1} / {pages.length}</span>
+                  {page.link_url && (
+                    <span className="text-xs text-brand-amber/60 flex items-center gap-1">
+                      <ExternalLink size={10} /> 링크
+                    </span>
+                  )}
+                </div>
+                {page.link_url && (
+                  <div className="absolute inset-0 bg-brand-charcoal/0 group-hover:bg-brand-charcoal/5 transition-colors pointer-events-none" />
+                )}
+              </Wrapper>
+            )
+          })}
         </div>
 
         {newsletter.pdf_url && (

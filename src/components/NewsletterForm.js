@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
-import { Save, Send, Calendar, Image, Trash2, ChevronUp, ChevronDown, Plus } from 'lucide-react'
+import { Save, Send, Calendar, Image, Trash2, ChevronUp, ChevronDown, Plus, Link } from 'lucide-react'
 
 export default function NewsletterForm({ newsletter = null }) {
   const [title, setTitle] = useState(newsletter?.title || '')
@@ -33,12 +33,18 @@ export default function NewsletterForm({ newsletter = null }) {
     setUploading(true)
     try {
       const urls = await Promise.all(files.map(uploadImage))
-      setPages(prev => [...prev, ...urls.map(url => ({ image_url: url }))])
+      setPages(prev => [...prev, ...urls.map(url => ({ image_url: url, link_url: '' }))])
     } catch (err) {
       alert(err.message)
     }
     setUploading(false)
     e.target.value = ''
+  }
+
+  const setPageLink = (index, link_url) => {
+    const updated = [...pages]
+    updated[index] = { ...updated[index], link_url }
+    setPages(updated)
   }
 
   const movePage = (index, direction) => {
@@ -150,9 +156,16 @@ export default function NewsletterForm({ newsletter = null }) {
                 className="flex gap-4 items-start bg-brand-charcoal/[0.02] rounded-xl p-3 border border-amber-900/5">
                 <div className="w-24 h-32 rounded-lg bg-cover bg-center flex-shrink-0 border border-amber-900/5 shadow-sm"
                   style={{ backgroundImage: `url(${page.image_url})` }} />
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 space-y-1.5">
                   <p className="text-sm font-medium text-brand-charcoal">페이지 {i + 1}</p>
-                  <p className="text-xs text-brand-charcoal/30 mt-0.5 truncate">{page.image_url}</p>
+                  <div className="flex items-center gap-1.5">
+                    <Link size={12} className="text-brand-charcoal/20 flex-shrink-0" />
+                    <input placeholder="링크 URL (선택)" value={page.link_url || ''}
+                      onChange={(e) => setPageLink(i, e.target.value)}
+                      className="w-full text-xs border-0 border-b border-amber-900/10 pb-0.5
+                                 focus:outline-none focus:border-brand-amber/40 transition-colors
+                                 placeholder:text-brand-charcoal/20 bg-transparent" />
+                  </div>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <button type="button" onClick={() => movePage(i, -1)} disabled={i === 0}
