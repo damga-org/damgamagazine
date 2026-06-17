@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import SectionRenderer from '@/components/SectionRenderer'
 import { ArrowLeft, Download } from 'lucide-react'
 import Link from 'next/link'
@@ -13,7 +13,7 @@ export default function NewsletterDetailPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('newsletters').select('*').eq('id', id).eq('status', 'published').single()
+    getSupabase().from('newsletters').select('*').eq('id', id).eq('status', 'published').single()
       .then(({ data }) => {
         setNewsletter(data)
         setLoading(false)

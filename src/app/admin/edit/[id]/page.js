@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import NewsletterForm from '@/components/NewsletterForm'
 
 export default function EditNewsletterPage() {
@@ -11,7 +11,7 @@ export default function EditNewsletterPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('newsletters').select('*').eq('id', id).single()
+    getSupabase().from('newsletters').select('*').eq('id', id).single()
       .then(({ data }) => {
         setNewsletter(data)
         setLoading(false)

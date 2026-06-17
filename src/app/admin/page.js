@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import { Plus, Edit, FileText, Trash2 } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       body: JSON.stringify({ id }),
     })
     if (res.ok) {
-      await supabase.from('newsletters').update({
+      await getSupabase().from('newsletters').update({
         status: 'published',
         published_at: new Date().toISOString(),
       }).eq('id', id)
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
-    await supabase.from('newsletters').delete().eq('id', id)
+    await getSupabase().from('newsletters').delete().eq('id', id)
     loadNewsletters()
   }
 

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { renderToStream } from '@react-pdf/renderer'
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import { createRouteHandlerClient } from '@supabase/ssr'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 const styles = StyleSheet.create({
@@ -65,14 +65,27 @@ export async function POST(request) {
 
     // 세션 확인
     const cookieStore = await cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {
+            // 읽기 전용 라우트 — 쿠키 설정 불필요
+          },
+        },
+      }
+    )
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // 소식지 데이터 조회
-    const { data: newsletter, error: fetchError } = await supabaseAdmin
+    const { data: newsletter, error: fetchError } = await getSupabaseAdmin()
       .from('newsletters')
       .select('*')
       .eq('id', id)
@@ -92,7 +105,7 @@ export async function POST(request) {
 
     // Supabase Storage에 업로드
     const fileName = `pdfs/${id}.pdf`
-    const { error: uploadError } = await supabaseAdmin.storage
+    const { error: uploadError } = await getSupabaseAdmin().storage
       .from('newsletter-assets')
       .upload(fileName, pdfBuffer, {
         contentType: 'application/pdf',
@@ -103,12 +116,12 @@ export async function POST(request) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 })
     }
 
-    const { data: { publicUrl } } = supabaseAdmin.storage
+    const { data: { publicUrl } } = getSupabaseAdmin().storage
       .from('newsletter-assets')
       .getPublicUrl(fileName)
 
     // newsletters 테이블에 pdf_url 업데이트
-    await supabaseAdmin
+    await getSupabaseAdmin()
       .from('newsletters')
       .update({ pdf_url: publicUrl })
       .eq('id', id)

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import SectionEditor from './SectionEditor'
 import { Save, Send } from 'lucide-react'
 
@@ -23,11 +23,11 @@ export default function NewsletterForm({ newsletter = null }) {
     if (coverImage) {
       const fileExt = coverImage.name.split('.').pop()
       const fileName = `covers/${Date.now()}.${fileExt}`
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await getSupabase().storage
         .from('newsletter-assets')
         .upload(fileName, coverImage)
       if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = getSupabase().storage
           .from('newsletter-assets')
           .getPublicUrl(fileName)
         coverImageUrl = publicUrl
@@ -43,9 +43,9 @@ export default function NewsletterForm({ newsletter = null }) {
     }
 
     if (newsletter?.id) {
-      await supabase.from('newsletters').update(payload).eq('id', newsletter.id)
+      await getSupabase().from('newsletters').update(payload).eq('id', newsletter.id)
     } else {
-      await supabase.from('newsletters').insert(payload)
+      await getSupabase().from('newsletters').insert(payload)
     }
 
     setSaving(false)

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import NewsletterCard from '@/components/NewsletterCard'
 import SearchBar from '@/components/SearchBar'
 
@@ -13,14 +13,14 @@ export default function HomePage() {
   const loadNewsletters = useCallback(async (query) => {
     setLoading(true)
 
-    let queryBuilder = supabase
+    let queryBuilder = getSupabase()
       .from('newsletters')
       .select('*')
       .eq('status', 'published')
       .order('published_at', { ascending: false })
 
     if (query?.trim()) {
-      queryBuilder = supabase
+      queryBuilder = getSupabase()
         .from('newsletters')
         .select('*')
         .eq('status', 'published')
