@@ -13,10 +13,18 @@ export default function NewsletterForm({ newsletter = null }) {
   const [coverPreview, setCoverPreview] = useState(newsletter?.cover_image || '')
   const [sections, setSections] = useState(newsletter?.content?.sections || [])
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
   const router = useRouter()
 
   const handleSave = async (status) => {
     setSaving(true)
+    setError(null)
+
+    if (!issueMonth) {
+      alert('발행월을 선택해주세요')
+      setSaving(false)
+      return
+    }
 
     let coverImageUrl = newsletter?.cover_image || ''
 
@@ -32,14 +40,8 @@ export default function NewsletterForm({ newsletter = null }) {
           .getPublicUrl(fileName)
         coverImageUrl = publicUrl
       } else {
-        alert('이미지 업로드에 실패했습니다')
+        alert('이미지 업로드에 실패했습니다: ' + uploadError.message)
       }
-    }
-
-    if (!issueMonth) {
-      alert('발행월을 선택해주세요')
-      setSaving(false)
-      return
     }
 
     const payload = {
@@ -48,17 +50,39 @@ export default function NewsletterForm({ newsletter = null }) {
       content: { sections },
       cover_image: coverImageUrl,
       status,
+      ...(status === 'published' ? { published_at: new Date().toISOString() } : {}),
     }
 
-    if (newsletter?.id) {
-      await getSupabase().from('newsletters').update(payload).eq('id', newsletter.id)
-    } else {
-      await getSupabase().from('newsletters').insert(payload)
-    }
+    try {
+      let savedId = newsletter?.id
 
-    setSaving(false)
-    router.push('/admin')
-    router.refresh()
+      if (savedId) {
+        const { error: saveError } = await getSupabase().from('newsletters').update(payload).eq('id', savedId)
+        if (saveError) throw saveError
+      } else {
+        const { data, error: saveError } = await getSupabase().from('newsletters').insert(payload).select('id').single()
+        if (saveError) throw saveError
+        savedId = data.id
+      }
+
+      if (status === 'published' && savedId) {
+        const res = await fetch('/api/generate-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: savedId }),
+        })
+        if (!res.ok) {
+          console.error('PDF 생성 실패:', await res.text())
+        }
+      }
+
+      setSaving(false)
+      router.push('/admin')
+      router.refresh()
+    } catch (err) {
+      setError(err.message)
+      setSaving(false)
+    }
   }
 
   const handleMenuItemImageUpload = async (sectionIndex, itemIndex, file) => {
@@ -98,6 +122,13 @@ export default function NewsletterForm({ newsletter = null }) {
         </h1>
         <p className="text-sm text-brand-charcoal/40 mt-1">가맹점에 전할 소식을 작성하세요</p>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4">
+          <p className="text-red-600 text-sm font-medium">저장 실패</p>
+          <p className="text-red-500 text-xs mt-1">{error}</p>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-amber-900/5 p-6 md:p-8 space-y-6">
         <input placeholder="소식지 제목 (예: 2026년 6월호)" value={title}

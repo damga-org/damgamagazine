@@ -30,13 +30,20 @@ export default function AdminDashboard() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
-    if (res.ok) {
-      await getSupabase().from('newsletters').update({
-        status: 'published',
-        published_at: new Date().toISOString(),
-      }).eq('id', id)
-      loadNewsletters()
+    if (!res.ok) {
+      const err = await res.json()
+      alert('발행 실패: ' + (err.error || 'PDF 생성 중 오류가 발생했습니다'))
+      return
     }
+    const { error: updateError } = await getSupabase().from('newsletters').update({
+      status: 'published',
+      published_at: new Date().toISOString(),
+    }).eq('id', id)
+    if (updateError) {
+      alert('상태 업데이트 실패: ' + updateError.message)
+      return
+    }
+    loadNewsletters()
   }
 
   const handleDelete = async (id) => {
