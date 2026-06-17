@@ -1,7 +1,65 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-cream: #FFF8F0;
+  --color-brand-charcoal: #2D1810;
+  --color-brand-amber: #C9A84C;
+  --color-brand-brass: #B8942E;
+  --color-brand-warm: #8B4513;
+  --color-brand-red: #C0392B;
+  --color-brand-cream-dark: #F5EDE0;
+  --color-surface: #FFFFFF;
+  --font-family-sans: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --font-family-display: 'Playfair Display', serif;
+}
 
 body {
-  font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-family-sans);
+}
+
+@layer components {
+  .card-premium {
+    @apply bg-white rounded-2xl shadow-sm border border-amber-900/5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply bg-brand-charcoal text-white px-6 py-2.5 rounded-xl font-medium
+           hover:bg-brand-warm active:scale-[0.98] transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-accent {
+    @apply bg-brand-amber text-white px-6 py-2.5 rounded-xl font-medium
+           hover:bg-brand-brass active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply border border-brand-charcoal/20 text-brand-charcoal px-6 py-2.5 rounded-xl font-medium
+           hover:bg-brand-charcoal/5 active:scale-[0.98] transition-all duration-200;
+  }
+
+  .input-premium {
+    @apply w-full border border-amber-900/10 rounded-xl px-4 py-3
+           bg-white/80 backdrop-blur-sm
+           focus:outline-none focus:ring-2 focus:ring-brand-amber/40 focus:border-brand-amber/60
+           transition-all duration-200 placeholder:text-gray-400;
+  }
+
+  .badge-draft {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-amber-100 text-amber-800;
+  }
+
+  .badge-published {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-emerald-100 text-emerald-800;
+  }
+
+  .section-title {
+    @apply text-sm font-semibold text-brand-charcoal/60 uppercase tracking-wider;
+  }
+
+  .gradient-header {
+    @apply bg-gradient-to-br from-brand-charcoal via-[#3D2317] to-brand-warm;
+  }
 }

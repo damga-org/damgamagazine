@@ -1,26 +1,43 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { Newspaper, ChevronRight } from 'lucide-react'
 
 export default function NewsletterCard({ newsletter }) {
   const router = useRouter()
 
   return (
     <div onClick={() => router.push(`/newsletter/${newsletter.id}`)}
-      className="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
-      {newsletter.cover_image ? (
-        <div className="h-40 bg-cover bg-center" style={{ backgroundImage: `url(${newsletter.cover_image})` }} />
-      ) : (
-        <div className="h-40 bg-stone-100 flex items-center justify-center text-stone-400">담가화로구이</div>
-      )}
-      <div className="p-4">
-        <h3 className="font-bold text-lg">{newsletter.title}</h3>
-        <p className="text-sm text-gray-500 mt-1">
+      className="card-premium group cursor-pointer overflow-hidden">
+      <div className="relative overflow-hidden">
+        {newsletter.cover_image ? (
+          <div className="h-44 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+            style={{ backgroundImage: `url(${newsletter.cover_image})` }} />
+        ) : (
+          <div className="h-44 bg-gradient-to-br from-brand-charcoal/5 to-brand-amber/5 flex items-center justify-center">
+            <Newspaper size={40} className="text-brand-amber/30" />
+          </div>
+        )}
+        <div className="absolute top-3 right-3">
+          <span className="badge-published">발행 완료</span>
+        </div>
+      </div>
+      <div className="p-5">
+        <h3 className="font-bold text-lg text-brand-charcoal group-hover:text-brand-warm transition-colors">
+          {newsletter.title}
+        </h3>
+        <p className="text-sm text-brand-charcoal/40 mt-1.5 font-medium">
           {new Date(newsletter.issue_month).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
         </p>
-        <p className="text-xs text-stone-400 mt-2 line-clamp-2">
-          {newsletter.content?.sections?.[0]?.body?.slice(0, 80)}
-        </p>
+        {newsletter.content?.sections?.[0]?.body && (
+          <p className="text-sm text-brand-charcoal/60 mt-3 line-clamp-2 leading-relaxed">
+            {newsletter.content.sections[0].body.slice(0, 100)}
+          </p>
+        )}
+        <div className="mt-4 pt-3 border-t border-amber-900/5 flex items-center justify-between">
+          <span className="text-xs text-brand-charcoal/30">자세히 보기</span>
+          <ChevronRight size={14} className="text-brand-amber group-hover:translate-x-0.5 transition-transform" />
+        </div>
       </div>
     </div>
   )

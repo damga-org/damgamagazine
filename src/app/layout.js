@@ -9,7 +9,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body className="bg-[#FAF8F5] text-[#2D2926]">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet" />
+      </head>
+      <body className="bg-brand-cream text-brand-charcoal antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

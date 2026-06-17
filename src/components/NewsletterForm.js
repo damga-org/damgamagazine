@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import SectionEditor from './SectionEditor'
-import { Save, Send } from 'lucide-react'
+import { Save, Send, Image, Calendar } from 'lucide-react'
 
 export default function NewsletterForm({ newsletter = null }) {
   const [title, setTitle] = useState(newsletter?.title || '')
@@ -91,38 +91,72 @@ export default function NewsletterForm({ newsletter = null }) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">{newsletter ? '소식지 수정' : '새 소식지 작성'}</h1>
+    <div className="max-w-3xl mx-auto p-6 space-y-8">
+      <div>
+        <h1 className="text-2xl font-black text-brand-charcoal">
+          {newsletter ? '소식지 수정' : '새 소식지 작성'}
+        </h1>
+        <p className="text-sm text-brand-charcoal/40 mt-1">가맹점에 전할 소식을 작성하세요</p>
+      </div>
 
-      <div className="space-y-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-amber-900/5 p-6 md:p-8 space-y-6">
         <input placeholder="소식지 제목 (예: 2026년 6월호)" value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-lg px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-stone-400" />
+          className="w-full border-0 border-b-2 border-amber-900/10 px-0 pb-3 text-xl font-bold text-brand-charcoal
+                     focus:outline-none focus:border-brand-amber/60 transition-colors
+                     placeholder:text-brand-charcoal/20" />
 
-        <div>
-          <label className="block text-sm text-gray-500 mb-1">발행월</label>
-          <input type="month" value={issueMonth} onChange={(e) => setIssueMonth(e.target.value)} required
-            className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stone-400" />
+        <div className="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label className="section-title flex items-center gap-1.5 mb-2">
+              <Calendar size={12} /> 발행월
+            </label>
+            <input type="month" value={issueMonth} onChange={(e) => setIssueMonth(e.target.value)} required
+              className="input-premium" />
+          </div>
+
+          <div>
+            <label className="section-title flex items-center gap-1.5 mb-2">
+              <Image size={12} /> 커버 이미지
+            </label>
+            <div className="flex items-center gap-3">
+              {coverPreview && (
+                <div className="w-16 h-16 rounded-xl bg-cover bg-center flex-shrink-0 border border-amber-900/5"
+                  style={{ backgroundImage: `url(${coverPreview})` }} />
+              )}
+              <label className="btn-outline text-sm cursor-pointer inline-flex items-center gap-1.5">
+                <Image size={14} />
+                {coverPreview ? '변경' : '업로드'}
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              </label>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div>
-          <label className="block text-sm text-gray-500 mb-1">커버 이미지</label>
-          {coverPreview && <img src={coverPreview} alt="cover" className="w-40 h-28 object-cover rounded-lg mb-2" />}
-          <input type="file" accept="image/*" onChange={handleImageUpload}
-            className="text-sm" />
+      <div className="bg-white rounded-2xl shadow-sm border border-amber-900/5 p-6 md:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-bold text-brand-charcoal">섹션 편집</h2>
+          <span className="text-xs text-brand-charcoal/30">{sections.length}개 섹션</span>
         </div>
-
         <SectionEditor sections={sections} onChange={setSections} onImageUpload={handleMenuItemImageUpload} />
       </div>
 
-      <div className="flex gap-3 pt-4">
+      <div className="flex gap-3 pt-2">
         <button onClick={() => handleSave('draft')} disabled={saving || !title}
-          className="flex items-center gap-2 px-6 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50">
-          <Save size={18} /> 초안 저장
+          className="btn-outline flex items-center gap-2 disabled:opacity-50">
+          <Save size={16} /> 초안 저장
         </button>
         <button onClick={() => handleSave('published')} disabled={saving || !title}
-          className="flex items-center gap-2 px-6 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-700 disabled:opacity-50">
-          <Send size={18} /> {saving ? '저장 중...' : '발행'}
+          className="btn-primary flex items-center gap-2 disabled:opacity-50">
+          {saving ? (
+            <span className="flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              저장 중...
+            </span>
+          ) : (
+            <><Send size={16} /> 발행하기</>
+          )}
         </button>
       </div>
     </div>
