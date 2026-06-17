@@ -31,12 +31,20 @@ export default function NewsletterForm({ newsletter = null }) {
           .from('newsletter-assets')
           .getPublicUrl(fileName)
         coverImageUrl = publicUrl
+      } else {
+        alert('이미지 업로드에 실패했습니다')
       }
+    }
+
+    if (!issueMonth) {
+      alert('발행월을 선택해주세요')
+      setSaving(false)
+      return
     }
 
     const payload = {
       title,
-      issue_month: issueMonth ? `${issueMonth}-01` : null,
+      issue_month: `${issueMonth}-01`,
       content: { sections },
       cover_image: coverImageUrl,
       status,
@@ -72,7 +80,7 @@ export default function NewsletterForm({ newsletter = null }) {
 
         <div>
           <label className="block text-sm text-gray-500 mb-1">발행월</label>
-          <input type="month" value={issueMonth} onChange={(e) => setIssueMonth(e.target.value)}
+          <input type="month" value={issueMonth} onChange={(e) => setIssueMonth(e.target.value)} required
             className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-stone-400" />
         </div>
 

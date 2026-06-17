@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   }, [])
 
   const loadNewsletters = async () => {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('newsletters')
       .select('*')
       .order('issue_month', { ascending: false })

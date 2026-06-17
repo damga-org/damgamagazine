@@ -24,7 +24,7 @@ export default function HomePage() {
         .from('newsletters')
         .select('*')
         .eq('status', 'published')
-        .textSearch('search_vector', query.trim().split(/\s+/).join(' & '), {
+        .textSearch('search_vector', query.trim(), {
           type: 'websearch',
           config: 'simple',
         })
