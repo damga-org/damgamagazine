@@ -8,7 +8,7 @@ const sectionTypes = [
   { value: 'notice', label: '공지사항' },
 ]
 
-export default function SectionEditor({ sections, onChange }) {
+export default function SectionEditor({ sections, onChange, onImageUpload }) {
   const addSection = (type) => {
     const base = { type, title: '' }
     const newSection = type === 'text' ? { ...base, body: '' }
@@ -115,9 +115,15 @@ export default function SectionEditor({ sections, onChange }) {
                     <input placeholder="설명" value={item.description}
                       onChange={(e) => updateItem(si, ii, 'description', e.target.value)}
                       className="w-full border-b text-sm py-1 focus:outline-none focus:border-stone-800" />
-                    <input placeholder="이미지 URL" value={item.image_url}
-                      onChange={(e) => updateItem(si, ii, 'image_url', e.target.value)}
-                      className="w-full border-b text-sm py-1 focus:outline-none focus:border-stone-800" />
+                    {item.image_url && (
+                      <img src={item.image_url} alt={item.name} className="h-16 w-16 object-cover rounded" />
+                    )}
+                    <input type="file" accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file && onImageUpload) onImageUpload(si, ii, file)
+                      }}
+                      className="text-sm" />
                   </div>
                   <button type="button" onClick={() => removeItem(si, ii)}
                     className="p-1 text-red-400 hover:text-red-600 mt-1"><Trash2 size={14} /></button>

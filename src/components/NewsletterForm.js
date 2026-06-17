@@ -61,6 +61,27 @@ export default function NewsletterForm({ newsletter = null }) {
     router.refresh()
   }
 
+  const handleMenuItemImageUpload = async (sectionIndex, itemIndex, file) => {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `menu/${Date.now()}-${itemIndex}.${fileExt}`
+    const { error } = await getSupabase().storage
+      .from('newsletter-assets')
+      .upload(fileName, file)
+    if (error) {
+      alert('메뉴 이미지 업로드에 실패했습니다')
+      return
+    }
+    const { data: { publicUrl } } = getSupabase().storage
+      .from('newsletter-assets')
+      .getPublicUrl(fileName)
+
+    const updated = [...sections]
+    const items = [...updated[sectionIndex].items]
+    items[itemIndex] = { ...items[itemIndex], image_url: publicUrl }
+    updated[sectionIndex] = { ...updated[sectionIndex], items }
+    setSections(updated)
+  }
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -91,7 +112,7 @@ export default function NewsletterForm({ newsletter = null }) {
             className="text-sm" />
         </div>
 
-        <SectionEditor sections={sections} onChange={setSections} />
+        <SectionEditor sections={sections} onChange={setSections} onImageUpload={handleMenuItemImageUpload} />
       </div>
 
       <div className="flex gap-3 pt-4">
