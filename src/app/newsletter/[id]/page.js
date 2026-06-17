@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
-import { ArrowLeft, Download, Newspaper, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Download, Newspaper, ExternalLink, Printer } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewsletterDetailPage() {
@@ -75,34 +75,41 @@ export default function NewsletterDetailPage() {
               : {}
             return (
               <Wrapper key={i}
-                className="bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden group relative"
+                className="bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden group relative block"
                 {...wrapperProps}>
                 <img src={page.image_url} alt={`${newsletter.title} - 페이지 ${i + 1}`}
                   className="w-full h-auto" />
+                {page.link_url && (
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
+                      bg-brand-amber/90 text-white text-xs font-medium shadow-lg
+                      backdrop-blur-sm">
+                      <ExternalLink size={12} />
+                      페이지 이동
+                    </span>
+                  </div>
+                )}
                 <div className="px-4 py-2 bg-brand-charcoal/5 flex items-center justify-center gap-2">
                   <span className="text-xs text-brand-charcoal/40">{i + 1} / {pages.length}</span>
-                  {page.link_url && (
-                    <span className="text-xs text-brand-amber/60 flex items-center gap-1">
-                      <ExternalLink size={10} /> 링크
-                    </span>
-                  )}
                 </div>
-                {page.link_url && (
-                  <div className="absolute inset-0 bg-brand-charcoal/0 group-hover:bg-brand-charcoal/5 transition-colors pointer-events-none" />
-                )}
               </Wrapper>
             )
           })}
         </div>
 
-        {newsletter.pdf_url && (
-          <div className="mt-8 text-center">
+        <div className="mt-8 flex items-center justify-center gap-3">
+          {newsletter.pdf_url ? (
             <a href={newsletter.pdf_url} target="_blank" rel="noopener noreferrer"
               className="btn-accent inline-flex items-center gap-2">
               <Download size={16} /> PDF 다운로드
             </a>
-          </div>
-        )}
+          ) : (
+            <button onClick={() => window.print()}
+              className="btn-outline inline-flex items-center gap-2">
+              <Printer size={16} /> PDF로 저장 (인쇄)
+            </button>
+          )}
+        </div>
       </div>
     </main>
   )
