@@ -1,57 +1,19 @@
 import { NextResponse } from 'next/server'
 import { renderToStream } from '@react-pdf/renderer'
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
+import { Document, Page, Image } from '@react-pdf/renderer'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-const styles = StyleSheet.create({
-  page: { padding: 40, fontFamily: 'Helvetica' },
-  title: { fontSize: 24, marginBottom: 8, fontWeight: 'bold' },
-  date: { fontSize: 12, color: '#666', marginBottom: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginTop: 16, marginBottom: 8 },
-  body: { fontSize: 11, lineHeight: 1.6, marginBottom: 12 },
-  menuItem: { marginBottom: 8, paddingLeft: 8 },
-  menuName: { fontSize: 13, fontWeight: 'bold' },
-  menuDesc: { fontSize: 10, color: '#555' },
-  image: { width: 200, height: 120, objectFit: 'cover', marginVertical: 8 },
-  noticeBox: { backgroundColor: '#f5f5f5', padding: 12, borderRadius: 4, marginBottom: 12 },
-})
-
 function NewsletterPDF({ newsletter }) {
+  const pages = newsletter.content?.pages || []
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>{newsletter.title}</Text>
-        <Text style={styles.date}>{newsletter.issue_month}</Text>
-
-        {newsletter.cover_image && (
-          <Image style={styles.image} src={newsletter.cover_image} />
-        )}
-
-        {(newsletter.content?.sections || []).map((section, i) => (
-          <View key={i}>
-            {section.title && <Text style={styles.sectionTitle}>{section.title}</Text>}
-
-            {section.type === 'text' && (
-              <Text style={styles.body}>{section.body}</Text>
-            )}
-
-            {section.type === 'notice' && (
-              <View style={styles.noticeBox}>
-                <Text style={styles.body}>{section.body}</Text>
-              </View>
-            )}
-
-            {section.type === 'menu' && section.items?.map((item, ii) => (
-              <View key={ii} style={styles.menuItem}>
-                <Text style={styles.menuName}>{item.name}</Text>
-                <Text style={styles.menuDesc}>{item.description}</Text>
-              </View>
-            ))}
-          </View>
-        ))}
-      </Page>
+      {pages.map((page, i) => (
+        <Page key={i} size="A4">
+          <Image src={page.image_url} style={{ width: '100%', height: '100%' }} />
+        </Page>
+      ))}
     </Document>
   )
 }

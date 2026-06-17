@@ -1,49 +1,24 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import NewsletterCard from '@/components/NewsletterCard'
-import SearchBar from '@/components/SearchBar'
 import { Newspaper, Sparkles } from 'lucide-react'
 
 export default function HomePage() {
   const [newsletters, setNewsletters] = useState([])
-  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const loadNewsletters = useCallback(async (query) => {
-    setLoading(true)
-    try {
-      let queryBuilder = getSupabase()
-        .from('newsletters')
-        .select('*')
-        .eq('status', 'published')
-        .order('published_at', { ascending: false })
-
-      if (query?.trim()) {
-        queryBuilder = getSupabase()
-          .from('newsletters')
-          .select('*')
-          .eq('status', 'published')
-          .textSearch('search_vector', query.trim(), {
-            type: 'websearch',
-            config: 'simple',
-          })
-          .order('published_at', { ascending: false })
-      }
-
-      const { data } = await queryBuilder
-      setNewsletters(data || [])
-    } catch {
-      setNewsletters([])
-    }
-    setLoading(false)
-  }, [])
-
   useEffect(() => {
-    const timer = setTimeout(() => loadNewsletters(search), 300)
-    return () => clearTimeout(timer)
-  }, [search, loadNewsletters])
+    getSupabase()
+      .from('newsletters')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .then(({ data }) => setNewsletters(data || []))
+      .catch(() => setNewsletters([]))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <main className="min-h-screen">
@@ -71,38 +46,29 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 -mt-7 mb-10 relative z-10">
-        <SearchBar value={search} onChange={setSearch} />
-      </div>
-
-      <div className="max-w-5xl mx-auto px-6 pb-20">
+      <div className="max-w-5xl mx-auto px-6 pb-20 -mt-4">
         {loading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-10">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-amber-900/5 animate-pulse">
-                <div className="h-40 bg-amber-900/10" />
+                <div className="h-44 bg-amber-900/10" />
                 <div className="p-4 space-y-3">
                   <div className="h-5 bg-amber-900/10 rounded w-3/4" />
                   <div className="h-3 bg-amber-900/10 rounded w-1/2" />
-                  <div className="h-3 bg-amber-900/10 rounded w-full" />
                 </div>
               </div>
             ))}
           </div>
         ) : newsletters.length === 0 ? (
-          <div className="text-center py-20">
+          <div className="text-center py-20 mt-6">
             <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
               <Newspaper size={28} className="text-brand-amber" />
             </div>
-            <p className="text-brand-charcoal/50 text-lg font-medium">
-              {search ? '검색 결과가 없습니다' : '첫 소식지를 기다리고 있어요'}
-            </p>
-            <p className="text-brand-charcoal/30 text-sm mt-1">
-              {search ? '다른 키워드로 검색해보세요' : '곧 발행될 예정입니다'}
-            </p>
+            <p className="text-brand-charcoal/50 text-lg font-medium">첫 소식지를 기다리고 있어요</p>
+            <p className="text-brand-charcoal/30 text-sm mt-1">곧 발행될 예정입니다</p>
           </div>
         ) : (
-          <>
+          <div className="mt-10">
             <div className="flex items-center justify-between mb-6">
               <p className="text-brand-charcoal/50 text-sm">
                 총 <span className="font-semibold text-brand-charcoal/70">{newsletters.length}</span>개의 소식지
@@ -113,7 +79,7 @@ export default function HomePage() {
                 <NewsletterCard key={nl.id} newsletter={nl} />
               ))}
             </div>
-          </>
+          </div>
         )}
       </div>
     </main>
