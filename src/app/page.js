@@ -12,27 +12,30 @@ export default function HomePage() {
 
   const loadNewsletters = useCallback(async (query) => {
     setLoading(true)
-
-    let queryBuilder = getSupabase()
-      .from('newsletters')
-      .select('*')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-
-    if (query?.trim()) {
-      queryBuilder = getSupabase()
+    try {
+      let queryBuilder = getSupabase()
         .from('newsletters')
         .select('*')
         .eq('status', 'published')
-        .textSearch('search_vector', query.trim(), {
-          type: 'websearch',
-          config: 'simple',
-        })
         .order('published_at', { ascending: false })
-    }
 
-    const { data } = await queryBuilder
-    setNewsletters(data || [])
+      if (query?.trim()) {
+        queryBuilder = getSupabase()
+          .from('newsletters')
+          .select('*')
+          .eq('status', 'published')
+          .textSearch('search_vector', query.trim(), {
+            type: 'websearch',
+            config: 'simple',
+          })
+          .order('published_at', { ascending: false })
+      }
+
+      const { data } = await queryBuilder
+      setNewsletters(data || [])
+    } catch {
+      setNewsletters([])
+    }
     setLoading(false)
   }, [])
 

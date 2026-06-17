@@ -10,16 +10,20 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getSupabase().auth.getSession().then(({ data: { session } }) => {
+    const supabase = getSupabase()
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      setLoading(false)
+    }).catch(() => {
       setLoading(false)
     })
 
-    const { data: { subscription } } = getSupabase().auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
 
-    return () => subscription.unsubscribe()
+    return () => subscription?.unsubscribe()
   }, [])
 
   return (
