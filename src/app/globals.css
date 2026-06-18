@@ -62,4 +62,29 @@ body {
   .gradient-header {
     @apply bg-gradient-to-br from-brand-charcoal via-[#3D2317] to-brand-warm;
   }
+
+  .print-page {
+    break-after: page;
+  }
+}
+
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
+  .print-page {
+    break-after: page;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .print-page img {
+    width: 100% !important;
+    height: 100vh !important;
+    object-fit: contain !important;
+  }
+  .print-page:last-child {
+    break-after: auto;
+  }
 }

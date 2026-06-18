@@ -49,11 +49,11 @@ export default function NewsletterDetailPage() {
   return (
     <main className="min-h-screen bg-brand-cream">
       <div className="max-w-4xl mx-auto px-4 py-10">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-brand-charcoal/40 hover:text-brand-charcoal transition-colors mb-8 group">
+        <Link href="/" className="no-print inline-flex items-center gap-1.5 text-sm text-brand-charcoal/40 hover:text-brand-charcoal transition-colors mb-8 group">
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" /> 목록으로
         </Link>
 
-        <div className="mb-8">
+        <div className="no-print mb-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-amber/20 to-brand-amber/10 flex items-center justify-center">
               <Newspaper size={16} className="text-brand-amber" />
@@ -75,7 +75,7 @@ export default function NewsletterDetailPage() {
               : {}
             return (
               <Wrapper key={i}
-                className="bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden group relative block"
+                className="print-page bg-white rounded-2xl shadow-lg shadow-amber-900/5 border border-amber-900/5 overflow-hidden group relative block"
                 {...wrapperProps}>
                 <img src={page.image_url} alt={`${newsletter.title} - 페이지 ${i + 1}`}
                   className="w-full h-auto" />
@@ -89,7 +89,7 @@ export default function NewsletterDetailPage() {
                     </span>
                   </div>
                 )}
-                <div className="px-4 py-2 bg-brand-charcoal/5 flex items-center justify-center gap-2">
+                <div className="no-print px-4 py-2 bg-brand-charcoal/5 flex items-center justify-center gap-2">
                   <span className="text-xs text-brand-charcoal/40">{i + 1} / {pages.length}</span>
                 </div>
               </Wrapper>
@@ -97,7 +97,7 @@ export default function NewsletterDetailPage() {
           })}
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-3">
+        <div className="no-print mt-8 flex items-center justify-center gap-3">
           {newsletter.pdf_url ? (
             <a href={newsletter.pdf_url} target="_blank" rel="noopener noreferrer"
               className="btn-accent inline-flex items-center gap-2">
